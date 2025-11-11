@@ -21,7 +21,7 @@ namespace uchebnayaPractica
             InitializeComponent();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void OpenOrganizator_Click(object sender, RoutedEventArgs e)
         {
             var window = new Organizator("Эмиль", "Гей");
             window.ShowDialog();

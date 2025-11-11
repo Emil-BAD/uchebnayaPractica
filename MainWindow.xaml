@@ -7,5 +7,6 @@
         mc:Ignorable="d"
         Title="Главное окно" Height="450" Width="800">
     <Grid>
+        <Button Content="Открыть Организатор" Width="200" Height="50" Click="OpenOrganizator_Click"/>
     </Grid>
 </Window>
