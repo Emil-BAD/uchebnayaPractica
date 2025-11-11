@@ -7,6 +7,5 @@
         mc:Ignorable="d"
         Title="Главное окно" Height="450" Width="800">
     <Grid>
-        <Button Content="ПЕРЕХОД" FontSize="123" Click="Button_Click"/>
     </Grid>
 </Window>
