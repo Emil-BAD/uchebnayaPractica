@@ -13,17 +13,16 @@
         <!-- Заголовок и кнопка авторизации -->
         <DockPanel Grid.Row="0" Margin="0,0,0,10">
             <TextBlock Text="Мероприятия" FontSize="28" FontWeight="Bold" Foreground="#333" DockPanel.Dock="Left"/>
-            <Button Content="Авторизация" Width="120" Height="35" HorizontalAlignment="Right" DockPanel.Dock="Right"
-                    Click="AuthButton_Click"/>
+            <Button Content="Авторизация" Width="120" Height="35" HorizontalAlignment="Right" DockPanel.Dock="Right" Click="AuthButton_Click"/>
         </DockPanel>
 
         <!-- Панель фильтров -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10" HorizontalAlignment="Left" VerticalAlignment="Center">
             <TextBlock Text="Фильтр по направлению:" VerticalAlignment="Center" Margin="0,0,10,0"/>
-            <ComboBox x:Name="DirectionFilter" Width="150" SelectionChanged="FilterChanged" Margin="0,0,20,0"/>
+            <ComboBox x:Name="DirectionFilter" Width="150" SelectionChanged="DirectionFilter_SelectionChanged" Margin="0,0,20,0"/>
 
             <TextBlock Text="Дата:" VerticalAlignment="Center" Margin="0,0,10,0"/>
-            <DatePicker x:Name="DateFilter" SelectedDateChanged="FilterChanged"/>
+            <DatePicker x:Name="DateFilter" SelectedDateChanged="DateFilter_SelectedDateChanged"/>
         </StackPanel>
 
         <!-- Список мероприятий -->

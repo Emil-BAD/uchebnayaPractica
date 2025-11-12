@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+   
     <None Remove="Resources\foto1.jpg" />
     <None Remove="Resources\foto10.jpg" />
     <None Remove="Resources\foto11.jpg" />
@@ -80,6 +81,9 @@
     <None Remove="Resources\foto8.jpg" />
     <None Remove="Resources\foto9.jpg" />
     <None Remove="Resources\no_photo.png" />
+	<None Remove="Resources\*.jpg" />
+	<None Remove="Resources\*.jpeg" />
+	<None Remove="Resources\5.jpeg" />
   </ItemGroup>
 
   <ItemGroup>
@@ -96,6 +100,14 @@
 
 	<ItemGroup>
 		<Resource Include="Resources\*.jpg" />
+		<Resource Include="Resources\1.jpeg" />
+		<Resource Include="Resources\14.png" />
+		<Resource Include="Resources\18.jpeg" />
+		<Resource Include="Resources\2.jpeg" />
+		<Resource Include="Resources\3.jpeg" />
+		<Resource Include="Resources\4.jpeg" />
+		<Resource Include="Resources\5.png" />
+		<Resource Include="Resources\8.jpeg" />
 		<Resource Include="Resources\no_photo.png" />
 	</ItemGroup>
 
