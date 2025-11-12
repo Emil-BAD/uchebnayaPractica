@@ -19,7 +19,6 @@ namespace uchebnayaPractica
             LoadEvents();
         }
 
-        // Загрузка направлений
         private void LoadDirections()
         {
             var directions = _context.Direction
@@ -30,7 +29,6 @@ namespace uchebnayaPractica
             DirectionFilter.SelectedIndex = 0;
         }
 
-        // Загрузка всех мероприятий
         private void LoadEvents()
         {
             var events = _context.Event
@@ -46,14 +44,12 @@ namespace uchebnayaPractica
                         e.EventTypeDictionary
                             .Select(etd => etd.IddictionaryNavigation.DirectionName)
                             .Distinct()),
-                    // Сопоставляем логотип по ID события
                     Logo = GetLogoPath(e.Id)
                 })
                 .ToList();
             EventList.ItemsSource = events;
         }
 
-        // Применение фильтров
         private void ApplyFilter()
         {
             var filtered = _context.Event
@@ -61,7 +57,6 @@ namespace uchebnayaPractica
                     .ThenInclude(etd => etd.IddictionaryNavigation)
                 .AsQueryable();
 
-            // Фильтр по направлению
             if (DirectionFilter.SelectedItem != null && DirectionFilter.SelectedItem.ToString() != "Все направления")
             {
                 string selectedDirection = DirectionFilter.SelectedItem.ToString();
@@ -69,7 +64,6 @@ namespace uchebnayaPractica
                     .Any(etd => etd.IddictionaryNavigation.DirectionName == selectedDirection));
             }
 
-            // Фильтр по дате
             if (DateFilter.SelectedDate.HasValue)
             {
                 DateOnly selectedDate = DateOnly.FromDateTime(DateFilter.SelectedDate.Value);
@@ -87,21 +81,18 @@ namespace uchebnayaPractica
                         e.EventTypeDictionary
                             .Select(etd => etd.IddictionaryNavigation.DirectionName)
                             .Distinct()),
-                    // Сопоставляем логотип по ID события
                     Logo = GetLogoPath(e.Id)
                 })
                 .ToList();
             EventList.ItemsSource = result;
         }
 
-        // Универсальный метод для получения пути к логотипу (сопоставление по ID события, цикл 1-20)
         private string GetLogoPath(int eventId)
         {
-            int logoIndex = (eventId - 1) % 20 + 1; // Получаем 1..20 на основе eventId
+            int logoIndex = (eventId - 1) % 20 + 1;
             return $"pack://application:,,,/Resources/{logoIndex}.jpeg";
         }
 
-        // Обработчики фильтров
         private void DirectionFilter_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             ApplyFilter();
