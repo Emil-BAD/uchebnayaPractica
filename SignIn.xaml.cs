@@ -6,11 +6,17 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
+using uchebnayaPractica.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Windows.Media;
 
 namespace uchebnayaPractica
 {
     public partial class SignIn : Window
     {
+
+        string? imageUri = null;
         public SignIn()
         {
             InitializeComponent();
@@ -24,26 +30,72 @@ namespace uchebnayaPractica
         #region === Генерация ID ===
         private void GenerateIdNumber()
         {
-            IdNumberText.Text = $"{DateTime.Now:yyyyMMddHHmmss}";
+
+            IdNumberText.Text = "13002";
+            try
+            {
+                using (var context = new Praktika2Context())
+                {
+                    // 4. Поиск пользователя (с загрузкой ролей)
+                    var user = context.User
+                        .OrderBy(u => u.Id)
+                        .Last();
+                    IdNumberText.Text = $"{user.Id + 1}";
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusText.Foreground = Brushes.Red;
+                StatusText.Text = $"Ошибка: {ex.Message}";
+            }
         }
         #endregion
 
         #region === Загрузка списков ===
         private void LoadDirections()
         {
-            DirectionComboBox.Items.Add("Программирование");
-            DirectionComboBox.Items.Add("Дизайн");
-            DirectionComboBox.Items.Add("Маркетинг");
-            DirectionComboBox.Items.Add("Менеджмент");
-            DirectionComboBox.Items.Add("Наука");
+            ///DirectionComboBox.Items.Add("Программирование");
+            ///DirectionComboBox.Items.Add("Дизайн");
+            ///DirectionComboBox.Items.Add("Маркетинг");
+            ///DirectionComboBox.Items.Add("Менеджмент");
+            ///DirectionComboBox.Items.Add("Наука");
+
+            try
+            {
+                using (var context = new Praktika2Context())
+                {
+                    var directions = context.Direction
+                        .OrderBy(u => u.Id);
+                    DirectionComboBox.ItemsSource = directions;
+                }
+            }
+            catch(Exception ex)
+            {
+                StatusText.Foreground = Brushes.Red;
+                StatusText.Text = $"Ошибка: {ex.Message}";
+            }
         }
 
         private void LoadEvents()
         {
-            EventComboBox.Items.Add("Хакатон 2024");
-            EventComboBox.Items.Add("Научная конференция");
-            EventComboBox.Items.Add("Дизайн-выставка");
-            EventComboBox.Items.Add("Бизнес-форум");
+            ///EventComboBox.Items.Add("Хакатон 2024");
+            ///EventComboBox.Items.Add("Научная конференция");
+            ///EventComboBox.Items.Add("Дизайн-выставка");
+            ///EventComboBox.Items.Add("Бизнес-форум");
+            try
+            {
+                using (var context = new Praktika2Context())
+                {
+                    var directions = context.Event
+                        .OrderBy(u => u.Id);
+                    EventComboBox.ItemsSource = directions;
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusText.Foreground = Brushes.Red;
+                StatusText.Text = $"Ошибка: {ex.Message}";
+            }
         }
         #endregion
 
@@ -60,6 +112,7 @@ namespace uchebnayaPractica
             {
                 try
                 {
+                    imageUri = openFileDialog.FileName;
                     PhotoImage.Source = new BitmapImage(new Uri(openFileDialog.FileName));
                     RemovePhotoButton.Visibility = Visibility.Visible;
                 }
@@ -266,22 +319,50 @@ namespace uchebnayaPractica
                 string direction = CustomDirectionCheckBox.IsChecked == true ?
                     CustomDirectionTextBox.Text : DirectionComboBox.SelectedItem.ToString();
 
-                // Здесь будет сохранение в базу данных
-                SaveToDatabase(
-                    FullNameTextBox.Text,
-                    GenderComboBox.SelectedItem.ToString(),
-                    RoleComboBox.SelectedItem.ToString(),
-                    EmailTextBox.Text,
-                    PhoneTextBox.Text,
-                    direction,
-                    AttachToEventCheckBox.IsChecked.Value ? EventComboBox.SelectedItem.ToString() : null,
-                    password
-                );
 
-                MessageBox.Show("Регистрация успешно завершена!", "Успех",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
+                try
+                {
+                    using (var context = new Praktika2Context())
+                    {
+                        var user = context.User
+                            .Include(u => u.Idrole)
+                            .Where(u => u.Email == EmailTextBox.Text && u.Password == password)
+                            .Select(u => new
+                            {
+                                User = u,
+                                Roles = u.Idrole.Select(r => r.RoleName).ToList()
+                            })
+                            .FirstOrDefault();
 
-                this.Close();
+                        if (user == null)
+                        {
+                            var newUser = new User
+                            {
+                                Fio = FullNameTextBox.Text,
+                                Email = EmailTextBox.Text,
+                                Phone = PhoneTextBox.Text,
+                                Password = password,
+                                // Обязательные поля, которые нужно заполнить
+                                Dob = DateOnly.FromDateTime(DateTime.Today), // Укажите правильную дату рождения
+                                Image = imageUri // Укажите путь к изображению по умолчанию
+                            };
+
+                            context.User.Add(newUser);
+                            MessageBox.Show("Регистрация успешно завершена!", "Успех",
+                            MessageBoxButton.OK, MessageBoxImage.Information);
+
+                            this.Close();
+                        } else
+                        {
+                            StatusText.Foreground = Brushes.Red;
+                            StatusText.Text = "Пользователь с такими данными уже есть";
+                        }
+                    }
+                } 
+                catch (Exception ex) {
+                    StatusText.Foreground = Brushes.Red;
+                    StatusText.Text = $"Ошибка: {ex.Message}";
+                }
             }
             catch (Exception ex)
             {
