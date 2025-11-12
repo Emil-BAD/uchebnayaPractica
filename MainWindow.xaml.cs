@@ -23,7 +23,7 @@ namespace uchebnayaPractica
 
         private void OpenOrganizator_Click(object sender, RoutedEventArgs e)
         {
-            var window = new Organizator("Эмиль", "Гей");
+            var window = new Auth();
             window.ShowDialog();
         }
     }

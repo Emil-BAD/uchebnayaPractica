@@ -5,15 +5,22 @@
     <Grid>
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Vertical" Width="400" >
             <TextBlock HorizontalAlignment="Center" Text="Вход" FontSize="24"/>
+
             <TextBlock HorizontalAlignment="Left" Text="Логин:"/>
             <TextBox Width="200" x:Name="IdNumber" Margin="0 0 0 15"/>
+
             <TextBlock HorizontalAlignment="Left" Text="Пароль:"/>
             <PasswordBox Width="200" x:Name="Password" Margin="0 0 0 15"/>
 
+            <CheckBox x:Name="RememberMeCheckBox" Content="Запомнить меня" Margin="0 0 0 15"/>
+
             <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                 <Image x:Name="CaptchaImage" Width="160" Height="60" Stretch="Uniform"/>
-                <Button x:Name="BtnRefreshCaptcha" Content="Обновить" Margin="0 15 0 0" Click="BtnRefreshCaptcha_Click" Height="30" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+                <Button x:Name="BtnRefreshCaptcha" Content="Обновить" Margin="0 15 0 0"
+                        Click="BtnRefreshCaptcha_Click" Height="30"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
             </StackPanel>
+
             <TextBlock HorizontalAlignment="Left" Text="Введите код с картинки:"/>
             <TextBox Width="120" x:Name="CaptchaInput" Margin="0 0 0 15"/>
 

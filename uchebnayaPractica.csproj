@@ -9,6 +9,80 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\foto1.jpg" />
+    <None Remove="Resources\foto10.jpg" />
+    <None Remove="Resources\foto11.jpg" />
+    <None Remove="Resources\foto12.jpg" />
+    <None Remove="Resources\foto13.jpg" />
+    <None Remove="Resources\foto14.jpg" />
+    <None Remove="Resources\foto15.jpg" />
+    <None Remove="Resources\foto16.jpg" />
+    <None Remove="Resources\foto17.jpg" />
+    <None Remove="Resources\foto18.jpg" />
+    <None Remove="Resources\foto19.jpg" />
+    <None Remove="Resources\foto2.jpg" />
+    <None Remove="Resources\foto20.jpg" />
+    <None Remove="Resources\foto21.jpg" />
+    <None Remove="Resources\foto22.jpg" />
+    <None Remove="Resources\foto23.jpg" />
+    <None Remove="Resources\foto24.jpg" />
+    <None Remove="Resources\foto25.jpg" />
+    <None Remove="Resources\foto26.jpg" />
+    <None Remove="Resources\foto27.jpg" />
+    <None Remove="Resources\foto28.jpg" />
+    <None Remove="Resources\foto29.jpg" />
+    <None Remove="Resources\foto3.jpg" />
+    <None Remove="Resources\foto30.jpg" />
+    <None Remove="Resources\foto31.jpg" />
+    <None Remove="Resources\foto32.jpg" />
+    <None Remove="Resources\foto33.jpg" />
+    <None Remove="Resources\foto34.jpg" />
+    <None Remove="Resources\foto35.jpg" />
+    <None Remove="Resources\foto36.jpg" />
+    <None Remove="Resources\foto37.jpg" />
+    <None Remove="Resources\foto38.jpg" />
+    <None Remove="Resources\foto39.jpg" />
+    <None Remove="Resources\foto4.jpg" />
+    <None Remove="Resources\foto40.jpg" />
+    <None Remove="Resources\foto41.jpg" />
+    <None Remove="Resources\foto42.jpg" />
+    <None Remove="Resources\foto43.jpg" />
+    <None Remove="Resources\foto44.jpg" />
+    <None Remove="Resources\foto45.jpg" />
+    <None Remove="Resources\foto46.jpg" />
+    <None Remove="Resources\foto47.jpg" />
+    <None Remove="Resources\foto48.jpg" />
+    <None Remove="Resources\foto49.jpg" />
+    <None Remove="Resources\foto5.jpg" />
+    <None Remove="Resources\foto50.jpg" />
+    <None Remove="Resources\foto51.jpg" />
+    <None Remove="Resources\foto52.jpg" />
+    <None Remove="Resources\foto53.jpg" />
+    <None Remove="Resources\foto54.jpg" />
+    <None Remove="Resources\foto55.jpg" />
+    <None Remove="Resources\foto56.jpg" />
+    <None Remove="Resources\foto57.jpg" />
+    <None Remove="Resources\foto58.jpg" />
+    <None Remove="Resources\foto59.jpg" />
+    <None Remove="Resources\foto6.jpg" />
+    <None Remove="Resources\foto60.jpg" />
+    <None Remove="Resources\foto61.jpg" />
+    <None Remove="Resources\foto62.jpg" />
+    <None Remove="Resources\foto63.jpg" />
+    <None Remove="Resources\foto64.jpg" />
+    <None Remove="Resources\foto65.jpg" />
+    <None Remove="Resources\foto66.jpg" />
+    <None Remove="Resources\foto67.jpg" />
+    <None Remove="Resources\foto68.jpg" />
+    <None Remove="Resources\foto69.jpg" />
+    <None Remove="Resources\foto7.jpg" />
+    <None Remove="Resources\foto70.jpg" />
+    <None Remove="Resources\foto8.jpg" />
+    <None Remove="Resources\foto9.jpg" />
+    <None Remove="Resources\no_photo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -19,5 +93,10 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
+
+	<ItemGroup>
+		<Resource Include="Resources\*.jpg" />
+		<Resource Include="Resources\no_photo.png" />
+	</ItemGroup>
 
 </Project>
