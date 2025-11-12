@@ -5,24 +5,119 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:uchebnayaPractica"
         mc:Ignorable="d"
-        Title="SignIn" Height="450" Width="800">
-    <Grid>
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Vertical" Width="400" >
-            <TextBlock HorizontalAlignment="Center" Text="Регистрация" FontSize="24"/>
-            <TextBlock HorizontalAlignment="Left" Text="Логин:" Margin="16 0 0 0"/>
-            <TextBox Width="200" x:Name="LoginInput" Margin="0 0 0 0"/>
-            <TextBlock HorizontalAlignment="Left" Text="Пароль:" Margin="16 0 0 0"/>
-            <PasswordBox Width="200" x:Name="PasswordInput" Margin="0 0 0 15"/>
+        Title="SignIn" Height="550" Width="800">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-            <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                <Image x:Name="CaptchaImage" Width="160" Height="60" Stretch="Uniform"/>
-                <Button x:Name="BtnRefreshCaptcha" Content="Обновить" Margin="0 15 0 0" Click="BtnRefreshCaptcha_Click" Height="30" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
-            </StackPanel>
-            <TextBlock HorizontalAlignment="Left" Text="Введите код с картинки:"/>
-            <TextBox Width="120" x:Name="CaptchaInput" Margin="0 0 0 15"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
 
-            <Button Content="Зарегистрироваться" Width="150" Click="SignInButton_Click"/>
-            <TextBlock x:Name="StatusText" Margin="0 10 0 0" TextWrapping="Wrap"/>
+        <!-- Id Number -->
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Id Number:" Margin="0,0,10,5" VerticalAlignment="Center"/>
+        <TextBlock x:Name="IdNumberText" Grid.Row="0" Grid.Column="1" Margin="0,0,0,5" VerticalAlignment="Center" FontWeight="Bold"/>
+
+        <!-- ФИО -->
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="ФИО:" Margin="0,0,10,5" VerticalAlignment="Center"/>
+        <TextBox x:Name="FullNameTextBox" Grid.Row="1" Grid.Column="1" Margin="0,0,0,5" Height="25" TextChanged="Field_Changed"/>
+
+        <!-- Пол -->
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Пол:" Margin="0,0,10,5" VerticalAlignment="Center"/>
+        <ComboBox x:Name="GenderComboBox" Grid.Row="2" Grid.Column="1" Margin="0,0,0,5" Height="25" SelectionChanged="Field_Changed">
+            <ComboBoxItem Content="Мужской"/>
+            <ComboBoxItem Content="Женский"/>
+        </ComboBox>
+
+        <!-- Роль -->
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Роль:" Margin="0,0,10,5" VerticalAlignment="Center"/>
+        <ComboBox x:Name="RoleComboBox" Grid.Row="3" Grid.Column="1" Margin="0,0,0,5" Height="25" SelectionChanged="Field_Changed">
+            <ComboBoxItem Content="Жюри"/>
+            <ComboBoxItem Content="Модератор"/>
+        </ComboBox>
+
+        <!-- Email -->
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="Email:" Margin="0,0,10,5" VerticalAlignment="Center"/>
+        <TextBox x:Name="EmailTextBox" Grid.Row="4" Grid.Column="1" Margin="0,0,0,5" Height="25" TextChanged="Field_Changed"/>
+
+        <!-- Телефон -->
+        <TextBlock Grid.Row="5" Grid.Column="0" Text="Телефон:" Margin="0,0,10,5" VerticalAlignment="Center"/>
+        <TextBox x:Name="PhoneTextBox" Grid.Row="5" Grid.Column="1" Margin="0,0,0,5" Height="25" TextChanged="PhoneTextBox_TextChanged"/>
+
+        <!-- Направление -->
+        <TextBlock Grid.Row="6" Grid.Column="0" Text="Направление:" Margin="0,0,10,5" VerticalAlignment="Center"/>
+        <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Vertical" Margin="0,0,0,5">
+            <ComboBox x:Name="DirectionComboBox" Height="25" SelectionChanged="Field_Changed"/>
+            <CheckBox x:Name="CustomDirectionCheckBox" Content="Ручной ввод" 
+                      Checked="CustomDirectionCheckBox_Checked" Unchecked="CustomDirectionCheckBox_Unchecked" Margin="0,5,0,0"/>
+            <TextBox x:Name="CustomDirectionTextBox" Height="25" Margin="0,5,0,0" Visibility="Collapsed" TextChanged="Field_Changed"/>
+        </StackPanel>
+
+        <!-- Прикрепить к мероприятию -->
+        <CheckBox x:Name="AttachToEventCheckBox" Grid.Row="7" Grid.Column="1"
+                  Content="Прикрепить к мероприятию" Margin="0,0,0,5" VerticalAlignment="Center"
+                  Checked="AttachToEventCheckBox_Checked" Unchecked="AttachToEventCheckBox_Unchecked"/>
+
+        <!-- Мероприятие -->
+        <TextBlock Grid.Row="8" Grid.Column="0" Text="Мероприятие:" Margin="0,0,10,5" VerticalAlignment="Center"/>
+        <ComboBox x:Name="EventComboBox" Grid.Row="8" Grid.Column="1" Margin="0,0,0,5" Height="25" 
+                  Visibility="Collapsed" SelectionChanged="Field_Changed"/>
+
+        <!-- Фото -->
+        <TextBlock Grid.Row="9" Grid.Column="2" Text="Фото:" Margin="0,10,10,5" VerticalAlignment="Center"/>
+        <StackPanel Grid.Row="9" Grid.Column="3" Orientation="Horizontal" Margin="0,10,0,5">
+            <Button x:Name="BrowsePhotoButton" Content="Выбрать фото" Click="BrowsePhotoButton_Click" Width="100" Height="25" Margin="0,0,10,0"/>
+            <Button x:Name="RemovePhotoButton" Content="Удалить" Click="RemovePhotoButton_Click" Width="60" Height="25" Visibility="Collapsed"/>
+        </StackPanel>
+
+        <Image x:Name="PhotoImage" Grid.Row="0" Grid.Column="3" Grid.RowSpan="9" MaxHeight="100" MaxWidth="100" 
+               Margin="0,0,0,10" HorizontalAlignment="Center" />
+
+        <!-- Пароль -->
+        <TextBlock Grid.Row="12" Grid.Column="2" Text="Пароль:" Margin="0,0,10,5" VerticalAlignment="Center"/>
+        <StackPanel Grid.Row="12" Grid.Column="3" Orientation="Vertical" Margin="0,0,0,5" Width="250">
+            <PasswordBox x:Name="PasswordBox" PasswordChanged="PasswordBox_PasswordChanged" Height="25"/>
+            <TextBox x:Name="PasswordTextBox" TextChanged="PasswordTextBox_TextChanged" Height="25" Visibility="Collapsed"/>
+            <TextBlock x:Name="PasswordStrengthText" FontSize="10" Foreground="Gray" Margin="0,2,0,0"/>
+        </StackPanel>
+
+        <!-- Подтверждение пароля -->
+        <TextBlock Grid.Row="13" Grid.Column="2" Text="Подтверждение:" Margin="0,0,10,5" VerticalAlignment="Center"/>
+        <StackPanel Grid.Row="13" Grid.Column="3" Orientation="Vertical" Margin="0,0,0,5" Width="250">
+            <PasswordBox x:Name="ConfirmPasswordBox" PasswordChanged="ConfirmPasswordBox_PasswordChanged" Height="25"/>
+            <TextBox x:Name="ConfirmPasswordTextBox" TextChanged="PasswordTextBox_TextChanged" Height="25" Visibility="Collapsed"/>
+            <TextBlock x:Name="PasswordMatchText" Text="Пароли не совпадают" FontSize="10" Foreground="Red" Margin="0,2,0,0" Visibility="Collapsed"/>
+        </StackPanel>
+
+        <!-- Видимый пароль -->
+        <CheckBox x:Name="ShowPasswordCheckBox" Grid.Row="14" Grid.Column="1" Grid.ColumnSpan="2" 
+                  Content="Видимый пароль" Margin="0,5,0,10" VerticalAlignment="Center"
+                  Checked="ShowPasswordCheckBox_Checked" Unchecked="ShowPasswordCheckBox_Unchecked"/>
+
+        <!-- Кнопки -->
+        <StackPanel Grid.Row="16" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" 
+                    HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button x:Name="RegisterButton" Content="OK" Width="80" Height="25" Margin="0,0,10,0" 
+                    IsDefault="True" Click="RegisterButton_Click" IsEnabled="False"/>
+            <Button Content="Отмена" Width="80" Height="25" IsCancel="True" Click="CancelButton_Click"/>
         </StackPanel>
     </Grid>
 </Window>
