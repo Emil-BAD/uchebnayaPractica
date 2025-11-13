@@ -249,5 +249,11 @@ namespace uchebnayaPractica
             return bitmap;
         }
         #endregion
+
+        private void Hyperlink_Click(object sender, RoutedEventArgs e)
+        {
+            var window = new SignIn();
+            window.ShowDialog();
+        }
     }
 }

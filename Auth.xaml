@@ -27,5 +27,11 @@
             <Button Content="Войти" Width="100" Click="BtnLogin_Click"/>
             <TextBlock x:Name="StatusText" Foreground="Red" Margin="0 10 0 0" TextWrapping="Wrap"/>
         </StackPanel>
+
+        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom">
+            <TextBlock Margin="20">
+                <Hyperlink Click="Hyperlink_Click">Нет аккаунта?</Hyperlink>
+            </TextBlock>
+        </StackPanel>
     </Grid>
 </Window>
