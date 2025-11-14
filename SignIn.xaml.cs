@@ -16,10 +16,11 @@ namespace uchebnayaPractica
     public partial class SignIn : Window
     {
 
-        string? imageUri = null;
+        private string imageFileName = "foto1.jpg";
         public SignIn()
         {
             InitializeComponent();
+            imageFileName = "foto1.jpg";
             AttachToEventCheckBox.IsChecked = true;
             PhotoImage.Source = new BitmapImage(new Uri("/Resources/foto1.jpg", UriKind.Relative));
             GenerateIdNumber();
@@ -52,29 +53,40 @@ namespace uchebnayaPractica
         #endregion
 
         #region === Загрузка списков ===
+        private string GetSelectedDirectionName()
+        {
+            if (CustomDirectionCheckBox.IsChecked == true)
+            {
+                return CustomDirectionTextBox.Text.Trim();
+            }
+            else
+            {
+                var selected = DirectionComboBox.SelectedItem as Direction;
+                return selected?.DirectionName?.Trim();
+            }
+        }
         private void LoadDirections()
         {
-            ///DirectionComboBox.Items.Add("Программирование");
-            ///DirectionComboBox.Items.Add("Дизайн");
-            ///DirectionComboBox.Items.Add("Маркетинг");
-            ///DirectionComboBox.Items.Add("Менеджмент");
-            ///DirectionComboBox.Items.Add("Наука");
-
             try
             {
                 using (var context = new Praktika2Context())
                 {
                     var directions = context.Direction
-                        .OrderBy(u => u.Id);
+                        .OrderBy(d => d.Id)
+                        .ToList();
+
                     DirectionComboBox.ItemsSource = directions;
+                    DirectionComboBox.DisplayMemberPath = "DirectionName";
+                    DirectionComboBox.SelectedValuePath = "Id"; // опционально, если нужно по ID
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 StatusText.Foreground = Brushes.Red;
-                StatusText.Text = $"Ошибка: {ex.Message}";
+                StatusText.Text = $"Ошибка загрузки направлений: {ex.Message}";
             }
         }
+
 
         private void LoadEvents()
         {
@@ -86,9 +98,15 @@ namespace uchebnayaPractica
             {
                 using (var context = new Praktika2Context())
                 {
-                    var directions = context.Event
-                        .OrderBy(u => u.Id);
-                    EventComboBox.ItemsSource = directions;
+                    var events = context.Event
+                        .OrderBy(u => u.Id)
+                        .ToList();
+                    var eventsName = new List<string>();
+                    for (var i = 0; i < events.Count; i++)
+                    {
+                        eventsName.Add(events[i].NameEvent);
+                    }
+                    EventComboBox.ItemsSource = eventsName;
                 }
             }
             catch (Exception ex)
@@ -102,31 +120,23 @@ namespace uchebnayaPractica
         #region === Выбор фото ===
         private void BrowsePhotoButton_Click(object sender, RoutedEventArgs e)
         {
-            var openFileDialog = new OpenFileDialog
+            OpenFileDialog openFileDialog = new OpenFileDialog
             {
-                Filter = "Image files (*.jpg;*.jpeg;*.png)|*.jpg;*.jpeg;*.png",
-                Title = "Выберите фото"
+                Filter = "Изображения (*.jpg;*.jpeg;*.png)|*.jpg;*.jpeg;*.png"
             };
 
             if (openFileDialog.ShowDialog() == true)
             {
-                try
-                {
-                    imageUri = openFileDialog.FileName;
-                    PhotoImage.Source = new BitmapImage(new Uri(openFileDialog.FileName));
-                    RemovePhotoButton.Visibility = Visibility.Visible;
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Ошибка загрузки фото: {ex.Message}", "Ошибка",
-                        MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                imageFileName = Path.GetFileName(openFileDialog.FileName); // ← Только имя
+                PhotoImage.Source = new BitmapImage(new Uri(openFileDialog.FileName));
+                RemovePhotoButton.Visibility = Visibility.Visible;
             }
         }
 
         private void RemovePhotoButton_Click(object sender, RoutedEventArgs e)
         {
-            PhotoImage.Source = null;
+            imageFileName = "foto1.jpg"; // ← Не null!
+            PhotoImage.Source = new BitmapImage(new Uri("/Resources/foto1.jpg", UriKind.Relative));
             RemovePhotoButton.Visibility = Visibility.Collapsed;
         }
         #endregion
@@ -254,7 +264,14 @@ namespace uchebnayaPractica
         }
         #endregion
 
+
         #region === Обновление кнопки регистрации ===
+
+        private void Field_Changed(object sender, RoutedEventArgs e)
+        {
+            // Логика для обновления состояния кнопки
+            UpdateRegisterButton();
+        }
         private void UpdateRegisterButton()
         {
             bool canRegister = !string.IsNullOrWhiteSpace(FullNameTextBox.Text) &&
@@ -269,27 +286,23 @@ namespace uchebnayaPractica
 
             RegisterButton.IsEnabled = canRegister;
         }
-
-        private void Field_Changed(object sender, System.Windows.RoutedEventArgs e)
-        {
-            UpdateRegisterButton();
-        }
         #endregion
 
         #region === Ручной ввод направления ===
         private void CustomDirectionCheckBox_Checked(object sender, RoutedEventArgs e)
         {
-            DirectionComboBox.IsEnabled = false;
-            CustomDirectionTextBox.Visibility = Visibility.Visible;
-            UpdateRegisterButton();
+            DirectionComboBox.IsEnabled = false; // Отключаем ComboBox
+            CustomDirectionTextBox.Visibility = Visibility.Visible; // Показываем поле для ввода
+            UpdateRegisterButton(); // Обновляем кнопку регистрации
         }
 
         private void CustomDirectionCheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
-            DirectionComboBox.IsEnabled = true;
-            CustomDirectionTextBox.Visibility = Visibility.Collapsed;
-            UpdateRegisterButton();
+            DirectionComboBox.IsEnabled = true; // Включаем ComboBox
+            CustomDirectionTextBox.Visibility = Visibility.Collapsed; // Скрываем поле для ввода
+            UpdateRegisterButton(); // Обновляем кнопку регистрации
         }
+
         #endregion
 
         #region === Прикрепление к мероприятию ===
@@ -311,66 +324,110 @@ namespace uchebnayaPractica
         {
             try
             {
-                // Получаем пароль в зависимости от режима отображения
-                string password = ShowPasswordCheckBox.IsChecked == true ?
-                    PasswordTextBox.Text : PasswordBox.Password;
+                string password = ShowPasswordCheckBox.IsChecked == true ? PasswordTextBox.Text : PasswordBox.Password;
+                string confirmPassword = ShowPasswordCheckBox.IsChecked == true ? ConfirmPasswordTextBox.Text : ConfirmPasswordBox.Password;
 
-                // Получаем направление
-                string direction = CustomDirectionCheckBox.IsChecked == true ?
-                    CustomDirectionTextBox.Text : DirectionComboBox.SelectedItem.ToString();
-
-
-                try
+                if (password != confirmPassword)
                 {
-                    using (var context = new Praktika2Context())
-                    {
-                        var user = context.User
-                            .Include(u => u.Idrole)
-                            .Where(u => u.Email == EmailTextBox.Text && u.Password == password)
-                            .Select(u => new
-                            {
-                                User = u,
-                                Roles = u.Idrole.Select(r => r.RoleName).ToList()
-                            })
-                            .FirstOrDefault();
-
-                        if (user == null)
-                        {
-                            var newUser = new User
-                            {
-                                Fio = FullNameTextBox.Text,
-                                Email = EmailTextBox.Text,
-                                Phone = PhoneTextBox.Text,
-                                Password = password,
-                                // Обязательные поля, которые нужно заполнить
-                                Dob = DateOnly.FromDateTime(DateTime.Today), // Укажите правильную дату рождения
-                                Image = imageUri // Укажите путь к изображению по умолчанию
-                            };
-
-                            context.User.Add(newUser);
-                            MessageBox.Show("Регистрация успешно завершена!", "Успех",
-                            MessageBoxButton.OK, MessageBoxImage.Information);
-
-                            this.Close();
-                        } else
-                        {
-                            StatusText.Foreground = Brushes.Red;
-                            StatusText.Text = "Пользователь с такими данными уже есть";
-                        }
-                    }
-                } 
-                catch (Exception ex) {
                     StatusText.Foreground = Brushes.Red;
-                    StatusText.Text = $"Ошибка: {ex.Message}";
+                    StatusText.Text = "Пароли не совпадают!";
+                    return;
+                }
+
+                string directionName = GetSelectedDirectionName();
+                if (string.IsNullOrWhiteSpace(directionName))
+                {
+                    StatusText.Foreground = Brushes.Red;
+                    StatusText.Text = "Направление не выбрано или не введено!";
+                    return;
+                }
+
+                string gender = GenderComboBox.SelectedItem is ComboBoxItem genderItem ? genderItem.Content.ToString() : null;
+                string role = RoleComboBox.SelectedItem is ComboBoxItem roleItem ? roleItem.Content.ToString() : null;
+
+                if (string.IsNullOrEmpty(gender) || string.IsNullOrEmpty(role))
+                {
+                    StatusText.Foreground = Brushes.Red;
+                    StatusText.Text = "Заполните все обязательные поля!";
+                    return;
+                }
+
+                using (var context = new Praktika2Context())
+                {
+                    // Проверка email
+                    if (context.User.Any(u => u.Email == EmailTextBox.Text.Trim()))
+                    {
+                        StatusText.Foreground = Brushes.Red;
+                        StatusText.Text = "Пользователь с таким email уже существует!";
+                        return;
+                    }
+
+                    // === КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: Загружаем в память ===
+                    var genders = context.Gender.AsEnumerable(); // <-- AsEnumerable() — клиентская оценка
+                    var roles = context.Role.AsEnumerable();
+                    var directions = context.Direction.AsEnumerable();
+
+                    var genderEntity = genders
+                        .FirstOrDefault(g => g.GenderName.Trim().Equals(gender.Trim(), StringComparison.OrdinalIgnoreCase));
+
+                    var roleEntity = roles
+                        .FirstOrDefault(r => r.RoleName.Trim().Equals(role.Trim(), StringComparison.OrdinalIgnoreCase));
+
+                    var directionEntity = directions
+                        .FirstOrDefault(d => d.DirectionName.Trim().Equals(directionName.Trim(), StringComparison.OrdinalIgnoreCase));
+
+                    if (genderEntity == null || roleEntity == null || directionEntity == null)
+                    {
+                        StatusText.Foreground = Brushes.Red;
+                        StatusText.Text = "Не найдено: пол, роль или направление!";
+                        return;
+                    }
+
+                    Event eventEntity = null;
+                    if (AttachToEventCheckBox.IsChecked == true && EventComboBox.SelectedItem != null)
+                    {
+                        var eventName = EventComboBox.SelectedItem.ToString();
+                        eventEntity = context.Event
+                            .FirstOrDefault(e => e.NameEvent == eventName); // Можно оставить, если NameEvent уникально
+                    }
+
+                    var newUser = new User
+                    {
+                        Id = int.Parse(IdNumberText.Text),
+                        Fio = FullNameTextBox.Text.Trim(),
+                        Email = EmailTextBox.Text.Trim(),
+                        Phone = PhoneTextBox.Text.Trim(),
+                        Password = password,
+                        Dob = DateOnly.FromDateTime(DateTime.Today),
+                        Image = imageFileName,
+                        Idgender = new List<Gender> { genderEntity },
+                        Idrole = new List<Role> { roleEntity },
+                        Iddirection = new List<Direction> { directionEntity },
+                        Idevent = eventEntity != null ? new List<Event> { eventEntity } : new List<Event>()
+                    };
+
+                    try
+                    {
+                        context.User.Add(newUser);
+                        context.SaveChanges();
+                    }
+                    catch (DbUpdateException dbEx)
+                    {
+                        // Логирование подробной ошибки
+                        StatusText.Foreground = Brushes.Red;
+                        StatusText.Text = $"Ошибка при сохранении: {dbEx.InnerException?.Message ?? dbEx.Message}";
+                    }
+
+                    MessageBox.Show("Регистрация успешно завершена!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при регистрации: {ex.Message}", "Ошибка",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                StatusText.Foreground = Brushes.Red;
+                StatusText.Text = $"Ошибка: {ex.Message}";
             }
         }
-
         private void SaveToDatabase(string fullName, string gender, string role, string email,
                                   string phone, string direction, string eventName, string password)
         {

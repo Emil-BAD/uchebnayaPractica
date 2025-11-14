@@ -60,12 +60,13 @@
 
         <!-- Телефон -->
         <TextBlock Grid.Row="5" Grid.Column="0" Text="Телефон:" Margin="0,0,10,5" VerticalAlignment="Center"/>
-        <TextBox x:Name="PhoneTextBox" Grid.Row="5" Grid.Column="1" Margin="0,0,0,5" Height="25" TextChanged="PhoneTextBox_TextChanged"/>
+        <TextBox x:Name="PhoneTextBox" Grid.Row="5" Grid.Column="1" Margin="0,0,0,5" Height="25" TextChanged="Field_Changed"/>
 
         <!-- Направление -->
         <TextBlock Grid.Row="6" Grid.Column="0" Text="Направление:" Margin="0,0,10,5" VerticalAlignment="Center"/>
         <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Vertical" Margin="0,0,0,5">
-            <ComboBox x:Name="DirectionComboBox" Height="25" SelectionChanged="Field_Changed"/>
+            <ComboBox x:Name="DirectionComboBox" Height="25" SelectionChanged="Field_Changed"
+          ItemsSource="{Binding Directions}" DisplayMemberPath="DirectionName"/>
             <CheckBox x:Name="CustomDirectionCheckBox" Content="Ручной ввод" 
                       Checked="CustomDirectionCheckBox_Checked" Unchecked="CustomDirectionCheckBox_Unchecked" Margin="0,5,0,0"/>
             <TextBox x:Name="CustomDirectionTextBox" Height="25" Margin="0,5,0,0" Visibility="Collapsed" TextChanged="Field_Changed"/>
