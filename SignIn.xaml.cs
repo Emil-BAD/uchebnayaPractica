@@ -5,11 +5,11 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using System.Text.RegularExpressions;
+using System.IO;
 using Microsoft.Win32;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
-using uchebnayaPractica.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Windows.Media;
+using uchebnayaPractica.Models;
 
 namespace uchebnayaPractica
 {
@@ -28,29 +28,25 @@ namespace uchebnayaPractica
             LoadEvents();
         }
 
-        #region === Генерация ID ===
-        private void GenerateIdNumber()
+        private void GenerateIdNumber ()
         {
-
-            IdNumberText.Text = "13002";
-            try
+            using (var context = new Praktika2Context())
             {
-                using (var context = new Praktika2Context())
+                try
                 {
-                    // 4. Поиск пользователя (с загрузкой ролей)
-                    var user = context.User
-                        .OrderBy(u => u.Id)
+                    var lastUser = context.User
+                        .OrderBy(x => x.Id)
                         .Last();
-                    IdNumberText.Text = $"{user.Id + 1}";
+                    var id = lastUser.Id + 1;
+                    IdNumberText.Text = id.ToString();
+                }
+                catch (Exception ex)
+                {
+                    StatusText.Foreground = Brushes.Red;
+                    StatusText.Text = $"Ошибка загрузки направлений: {ex.Message}";
                 }
             }
-            catch (Exception ex)
-            {
-                StatusText.Foreground = Brushes.Red;
-                StatusText.Text = $"Ошибка: {ex.Message}";
-            }
         }
-        #endregion
 
         #region === Загрузка списков ===
         private string GetSelectedDirectionName()
@@ -67,23 +63,23 @@ namespace uchebnayaPractica
         }
         private void LoadDirections()
         {
-            try
+            using (var context = new Praktika2Context())
             {
-                using (var context = new Praktika2Context())
+                try
                 {
                     var directions = context.Direction
-                        .OrderBy(d => d.Id)
-                        .ToList();
+                            .OrderBy(d => d.Id)
+                            .ToList();
 
                     DirectionComboBox.ItemsSource = directions;
                     DirectionComboBox.DisplayMemberPath = "DirectionName";
-                    DirectionComboBox.SelectedValuePath = "Id"; // опционально, если нужно по ID
+                    DirectionComboBox.SelectedValuePath = "Id";
                 }
-            }
-            catch (Exception ex)
-            {
-                StatusText.Foreground = Brushes.Red;
-                StatusText.Text = $"Ошибка загрузки направлений: {ex.Message}";
+                catch (Exception ex)
+                {
+                    StatusText.Foreground = Brushes.Red;
+                    StatusText.Text = $"Ошибка загрузки направлений: {ex.Message}";
+                }
             }
         }
 
@@ -218,46 +214,118 @@ namespace uchebnayaPractica
         #region === Форматирование телефона ===
         private string FormatPhoneNumber(string input)
         {
-            if (string.IsNullOrEmpty(input)) return "";
+            if (string.IsNullOrEmpty(input))
+                return input;
 
             // Удаляем все нецифровые символы кроме +
-            var digits = new string(input.Where(c => char.IsDigit(c) || c == '+').ToArray());
+            string digits = new string(input.Where(c => char.IsDigit(c) || c == '+').ToArray());
 
-            if (digits.StartsWith("+7") && digits.Length > 2)
+            // Обрабатываем начало номера
+            if (digits.StartsWith("8") && digits.Length > 1)
             {
-                string numbers = digits.Substring(2);
-                if (numbers.Length >= 3)
+                digits = "+7" + digits.Substring(1);
+            }
+            else if (!digits.StartsWith("+7"))
+            {
+                // Если номер не начинается с +7, добавляем +7
+                if (digits.StartsWith("7"))
                 {
-                    string result = $"+7({numbers.Substring(0, 3)})";
-                    if (numbers.Length >= 6)
-                    {
-                        result += $"-{numbers.Substring(3, 3)}";
-                        if (numbers.Length >= 8)
-                        {
-                            result += $"-{numbers.Substring(6, 2)}";
-                            if (numbers.Length >= 10)
-                            {
-                                result += $"-{numbers.Substring(8, 2)}";
-                            }
-                        }
-                    }
-                    return result;
+                    digits = "+" + digits;
+                }
+                else
+                {
+                    digits = "+7" + digits;
                 }
             }
 
-            return input;
+            // Ограничиваем длину (код страны + 10 цифр)
+            if (digits.Length > 12)
+                digits = digits.Substring(0, 12);
+
+            // Форматируем номер
+            StringBuilder formatted = new StringBuilder();
+
+            if (digits.Length >= 2)
+            {
+                formatted.Append(digits.Substring(0, 2)); // +7
+
+                if (digits.Length > 2)
+                {
+                    formatted.Append("(");
+                    // Берем следующие 3 цифры (код оператора)
+                    int operatorCodeLength = Math.Min(3, digits.Length - 2);
+                    formatted.Append(digits.Substring(2, operatorCodeLength));
+
+                    // Закрываем скобку только если набрано 3 цифры кода оператора
+                    if (operatorCodeLength == 3)
+                    {
+                        formatted.Append(")");
+
+                        if (digits.Length > 5)
+                        {
+                            formatted.Append("-");
+                            // Первые 3 цифры номера
+                            int firstPartLength = Math.Min(3, digits.Length - 5);
+                            formatted.Append(digits.Substring(5, firstPartLength));
+
+                            if (firstPartLength == 3 && digits.Length > 8)
+                            {
+                                formatted.Append("-");
+                                // Следующие 2 цифры
+                                int secondPartLength = Math.Min(2, digits.Length - 8);
+                                formatted.Append(digits.Substring(8, secondPartLength));
+
+                                if (secondPartLength == 2 && digits.Length > 10)
+                                {
+                                    formatted.Append("-");
+                                    // Последние 2 цифры
+                                    int thirdPartLength = Math.Min(2, digits.Length - 10);
+                                    formatted.Append(digits.Substring(10, thirdPartLength));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return formatted.ToString();
         }
 
-        private void PhoneTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        private void PhoneTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            // Сохраняем курсор
+            // Сохраняем позицию курсора и текст до форматирования
             int cursorPosition = PhoneTextBox.SelectionStart;
+            string originalText = PhoneTextBox.Text;
 
             string formatted = FormatPhoneNumber(PhoneTextBox.Text);
+
             if (formatted != PhoneTextBox.Text)
             {
                 PhoneTextBox.Text = formatted;
-                PhoneTextBox.SelectionStart = Math.Min(cursorPosition, formatted.Length);
+
+                // Логика для корректного позиционирования курсора
+                if (cursorPosition == originalText.Length)
+                {
+                    // Если курсор был в конце, ставим в конец
+                    PhoneTextBox.SelectionStart = formatted.Length;
+                }
+                else
+                {
+                    // Пытаемся сохранить позицию относительно содержания
+                    int newPosition = cursorPosition;
+
+                    // Если добавились символы форматирования, сдвигаем курсор
+                    if (formatted.Length > originalText.Length)
+                    {
+                        int addedChars = formatted.Length - originalText.Length;
+                        if (cursorPosition >= formatted.Length - addedChars)
+                        {
+                            newPosition = cursorPosition + addedChars;
+                        }
+                    }
+
+                    PhoneTextBox.SelectionStart = Math.Min(newPosition, formatted.Length);
+                }
             }
 
             UpdateRegisterButton();

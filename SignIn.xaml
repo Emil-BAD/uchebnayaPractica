@@ -121,6 +121,6 @@
             <Button Content="Отмена" Width="80" Height="25" IsCancel="True" Click="CancelButton_Click"/>
         </StackPanel>
 
-        <TextBox x:Name="StatusText" Foreground="Red" Grid.Row="16" Grid.Column="3" Width="150"></TextBox>
+        <TextBlock x:Name="StatusText" Foreground="Red" Grid.Row="16" Grid.Column="3" Width="150" Visibility="Hidden"></TextBlock>
     </Grid>
 </Window>
