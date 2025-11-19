@@ -1,22 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using Microsoft.Win32;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
+using uchebnayaPractica.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Windows.Media;
 
 namespace uchebnayaPractica
 {
-    /// <summary>
-    /// Логика взаимодействия для SignIn.xaml
-    /// </summary>
     public partial class SignIn : Window
     {
 
@@ -32,11 +28,29 @@ namespace uchebnayaPractica
             LoadEvents();
         }
 
-        private void generateAndShowCaptcha()
+        #region === Генерация ID ===
+        private void GenerateIdNumber()
         {
-            captchaCode = CaptchaGenerator.generateCaptchaCode(4);
-            CaptchaImage.Source = CaptchaGenerator.generateCaptchaImage(captchaCode, 165,60);
+
+            IdNumberText.Text = "13002";
+            try
+            {
+                using (var context = new Praktika2Context())
+                {
+                    // 4. Поиск пользователя (с загрузкой ролей)
+                    var user = context.User
+                        .OrderBy(u => u.Id)
+                        .Last();
+                    IdNumberText.Text = $"{user.Id + 1}";
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusText.Foreground = Brushes.Red;
+                StatusText.Text = $"Ошибка: {ex.Message}";
+            }
         }
+        #endregion
 
         #region === Загрузка списков ===
         private string GetSelectedDirectionName()
@@ -55,7 +69,7 @@ namespace uchebnayaPractica
         {
             try
             {
-                if (captchaCode == CaptchaInput.Text)
+                using (var context = new Praktika2Context())
                 {
                     var directions = context.Direction
                         .OrderBy(d => d.Id)
