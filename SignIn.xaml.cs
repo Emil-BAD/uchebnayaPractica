@@ -10,6 +10,8 @@ using System.IO;
 using Microsoft.Win32;
 using Microsoft.EntityFrameworkCore;
 using uchebnayaPractica.Models;
+using System.Windows.Media;
+using System.Text;
 
 namespace uchebnayaPractica
 {
